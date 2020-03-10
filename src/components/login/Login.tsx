@@ -1,13 +1,17 @@
 import * as React from 'react';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
+import { FormControl, InputLabel, Input, FormHelperText, Button } from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
+import compose from 'recompose/compose';
 import * as actions from '../../store/login/actions';
 import { LoginActions } from '../../store/login/types';
-import { FormControl, InputLabel, Input, FormHelperText, Button } from '@material-ui/core';
-  
-  function LoginForm(props: any) {
+import styles from './stylesLogin';
+
+function LoginForm(props: any) {
     const [email, setEmail] = React.useState('');
     const [password, setPass] = React.useState('');
+    const {classes} = props;
 
     const handleEmailChange = (event: React.ChangeEvent) => {
         console.log(`the event launched is: ${(event.target as HTMLInputElement).value}`);
@@ -25,8 +29,8 @@ import { FormControl, InputLabel, Input, FormHelperText, Button } from '@materia
     }
   
     return (
-        <React.Fragment>
-            <FormControl>
+        <div className={classes.container}>
+            <FormControl className={classes.centered}>
                 <InputLabel htmlFor="email">
                     Email address
                 </InputLabel>
@@ -35,17 +39,17 @@ import { FormControl, InputLabel, Input, FormHelperText, Button } from '@materia
                     We'll never share your email.
                 </FormHelperText>
             </FormControl>
-            <FormControl>
+            <FormControl className={classes.centered}>
                 <InputLabel htmlFor="password">
                     Password
                 </InputLabel>
                 <Input id="password" type="password" onChange={handlePassChange} value={password}/>
                 <FormHelperText id="my-helper-text">We'll never share your password.</FormHelperText>
             </FormControl>
-            <Button variant="contained" color="primary" onClick={handleSubmit}>
+            <Button className={classes.centered} variant="contained" color="primary" onClick={handleSubmit}>
                 Login
             </Button>
-        </React.Fragment>
+        </div>
     );
   }
   const mapDispatchToProps = (dispatch: Dispatch<LoginActions>) => {
@@ -54,4 +58,7 @@ import { FormControl, InputLabel, Input, FormHelperText, Button } from '@materia
         dispatch(actions.login(email, password))
     }
   }
-  export default connect(null, mapDispatchToProps) (LoginForm);
+  export default compose(
+      connect(null, mapDispatchToProps),
+      withStyles(styles)
+  )(LoginForm);

@@ -1,9 +1,12 @@
 import { ActionType } from 'typesafe-actions';
 import * as actions from './actions';
-export type DemoActions = ActionType<typeof actions>;
+import { GoogleLoginResponse } from "react-google-login";
 
+export type DemoActions = ActionType<typeof actions>;
+type BasicProfileGoogle = Pick<GoogleLoginResponse, "profileObj">;
+export type BasicProfileGoogleIn = {[K in keyof BasicProfileGoogle["profileObj"]]: BasicProfileGoogle["profileObj"][K]}
 export enum Constants {
-    LOGIN = 'LOGGIN'
+    LOGIN = 'LOGIN'
 }
 export interface ILoginState {
     isAuthenticated: boolean,

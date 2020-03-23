@@ -1,29 +1,28 @@
 import React from 'react';
+import { withRouter, Route, Switch } from 'react-router-dom';
+import {RouteComponentProps} from "react-router";
+import PrivateRoute from './components/privateRoute/PrivateRoute';
+import { PATHS } from './constants/Paths';
 import LoginForm from './components/login/Login';
 import Main from './components/main/Main';
-import { IRootState } from './store';
-import { connect } from 'react-redux';
 
-const mapStateToProps = ({ login }: IRootState) => {
-  const { isAuthenticated } = login;
-  return { isAuthenticated };
+type Params = {
+  prop : string;
 }
+type PropsType = RouteComponentProps<Params>;
 
-type ReduxType = ReturnType<typeof mapStateToProps>;
-
-class App extends React.Component<ReduxType> {
+class App extends React.Component<PropsType> {
   render(){
-    const {isAuthenticated} = this.props
+    console.log("App mounted");
     return (
       <React.Fragment>
-        {!isAuthenticated ?
-        (<div className="App">
-          <LoginForm/>
-        </div>) : (<Main/>)
-        }
+          <Switch>
+            <Route path={PATHS.LOGIN} exact component={LoginForm} />
+            <PrivateRoute component={<Main/>}/>
+          </Switch>
       </React.Fragment>
     );
   }
 }
 
-export default connect(mapStateToProps)(App);
+export default withRouter(App);

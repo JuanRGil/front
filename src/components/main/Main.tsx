@@ -1,12 +1,11 @@
 import React from 'react';
+import { store } from './../../store/store';
 
 function Main(props : any) {
+    console.log('state', store.getState());
     return (
         <React.Fragment>
-            <div>WIP</div>
-            {/*<Header/>
-            <Menu/>
-            <Content/>*/}
+            <div>Main WIP</div>
         </React.Fragment>
 
     )

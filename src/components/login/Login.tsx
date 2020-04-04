@@ -1,7 +1,6 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
-import { Redirect } from 'react-router-dom';
 import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
 import { PATHS } from '../../constants/Paths';
 import { withStyles } from '@material-ui/core/styles';
@@ -11,10 +10,14 @@ import { IRootState } from '../../store/store';
 import { LoginActions, BasicProfileGoogleIn } from '../../store/login/types';
 import styles from './stylesLogin';
 import { store } from './../../store/store';
+import { Redirect } from 'react-router-dom';
 
 function LoginForm(props: any) {
-    const {classes, onStoreLoginInfo, isAuth} = props;
+    const {classes, onStoreLoginInfo, isAuthenticated} = props;
 
+    useEffect(()=>{
+        sessionStorage.clear();
+    })
     const isGoogleLoginResponse = 
     (response: GoogleLoginResponse | GoogleLoginResponseOffline ) 
     : response is GoogleLoginResponse => {
@@ -24,8 +27,8 @@ function LoginForm(props: any) {
     const getGoogleResponse = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
         console.log("google response", response)
         if (isGoogleLoginResponse(response)) {
-            console.log("google response profile", response.profileObj)
-            onStoreLoginInfo(response.profileObj);
+            console.log("google response profile", response)
+            onStoreLoginInfo(response);
         } else {
             //error
         }
@@ -37,35 +40,40 @@ function LoginForm(props: any) {
         props.login(email, password);
     }
     */
-    console.log(isAuth);
+    console.log("Login 40 is authenticated", isAuthenticated);
     console.log('state', store.getState());
     return (
         <div className={classes.container}>
-            {!isAuth &&
+            {!isAuthenticated 
+            ? (
                 <GoogleLogin
                     clientId="87323419200-0r386di22s709lrk72mr2ddcrjbd16n7.apps.googleusercontent.com"
                     onSuccess={getGoogleResponse}
                     onFailure={getGoogleResponse}
+                    accessType="offline"
                     isSignedIn={true}
-                    render={() => <div/>}
+                    icon={false}
+                    render={() =><div/>}
+                    autoLoad={true}
+                    uxMode="redirect"
+                    redirectUri="http://localhost:3000/"
                 />
-            }
-            {isAuth &&
-                <Redirect to={PATHS.MAIN} />
-            }
+            )
+            : (<Redirect to={PATHS.MAIN}/>)}
         </div>
     );
   }
   const mapDispatchToProps = (dispatch: Dispatch<LoginActions>) => {
     return {
-        onStoreLoginInfo: (userDetails : BasicProfileGoogleIn) =>
+        onStoreLoginInfo: (userDetails : GoogleLoginResponse) =>
         dispatch(actions.storeLoginInfo(userDetails))
     }
   }
   const mapStateToProps = (state : IRootState) => {
     console.log("login state", state);
+    const { isAuthenticated } = state.loginSessionStorage ;
     return { 
-        isAuth: state.loginSessionStorage.isAuthenticated 
+        isAuthenticated
     };
   }
 

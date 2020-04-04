@@ -12,7 +12,8 @@ action: any): ILoginState {
                 ...state,
                 isAuthenticated: action.payload.isAuthenticated,
                 name: action.payload.name,
-                role: action.payload.role
+                role: action.payload.role,
+                googleUser: action.payload.googleUser
             };
         default:
             return state;

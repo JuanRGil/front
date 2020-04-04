@@ -1,5 +1,5 @@
 import React from 'react';
-import { withRouter, Route, Switch } from 'react-router-dom';
+import { withRouter, Route, Switch, Redirect } from 'react-router-dom';
 import {RouteComponentProps} from "react-router";
 import PrivateRoute from './components/privateRoute/PrivateRoute';
 import { PATHS } from './constants/Paths';
@@ -17,8 +17,9 @@ class App extends React.Component<PropsType> {
     return (
       <React.Fragment>
           <Switch>
-            <Route path={PATHS.LOGIN} exact component={LoginForm} />
-            <PrivateRoute component={<Main/>}/>
+            <Route path={PATHS.LOGIN} component={LoginForm} />
+            <PrivateRoute path={PATHS.MAIN} component={<Main/>}/>
+            <Redirect to={PATHS.LOGIN}/>
           </Switch>
       </React.Fragment>
     );

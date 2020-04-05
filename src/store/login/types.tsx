@@ -3,7 +3,8 @@ import * as actions from './actions';
 export type DemoActions = ActionType<typeof actions>;
 
 export enum Constants {
-    LOGIN = 'LOGGIN'
+    LOGIN = 'LOGGIN',
+    LOGOUT = 'LOGOUT'
 }
 export interface ILoginState {
     isAuthenticated: boolean,

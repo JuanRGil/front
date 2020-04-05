@@ -14,6 +14,13 @@ action: any): ILoginState {
                 name: action.payload.name,
                 role: action.payload.role
             };
+        case Constants.LOGOUT:
+            return {
+                ...state,
+                isAuthenticated: action.payload.isAuthenticated,
+                name: '',
+                role: ''
+            };
         default:
             return state;
     }

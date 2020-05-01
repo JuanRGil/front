@@ -1,23 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useCookies } from 'react-cookie'; 
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
-import { FormControl, InputLabel, Input, FormHelperText, Button } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
 import compose from 'recompose/compose';
+import { withStyles } from '@material-ui/core/styles';
+import axios from 'axios';
+import GoogleLogin from './GoogleLogin';
+import { FormControl, InputLabel, Input, FormHelperText, Button } from '@material-ui/core';
 import * as actions from '../../store/login/actions';
-import { LoginActions } from '../../store/login/types';
+import { LoginActions, IUserDetails } from '../../store/login/types';
 import styles from './stylesLogin';
 
 function LoginForm(props: any) {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPass] = useState('');
-    const [googleAuthObject, setGoogleAuthObject] = useState();
-    const [googleCurrentUser, setGoogleCurrentUser] = useState();
-    const {classes} = props;
+    const [cookies, setCookie] = useCookies(['auth_token']);
 
-    const handleEmailChange = (event: React.ChangeEvent) => {
+    const {classes, onPopulateUserDetails} = props;
+
+    const handleUsernameChange = (event: React.ChangeEvent) => {
         console.log(`the event launched is: ${(event.target as HTMLInputElement).value}`);
-        setEmail(event && event.target ? (event.target as HTMLInputElement).value : '');
+        setUsername(event && event.target ? (event.target as HTMLInputElement).value : '');
     };
 
     const handlePassChange = (event: React.ChangeEvent) => {
@@ -26,72 +29,25 @@ function LoginForm(props: any) {
     };
 
     const handleSubmit = () => {
-        const { login } = props;
         console.log("handle submit");
-        login(email, password);
+        const logingUrl = "http://localhost:8080/api/auth/signin";
+        axios.post(logingUrl, {
+            username,
+            password
+        }).then((response : any) => {
+            
+            onPopulateUserDetails(response.data.userDetails);
+            setCookie('auth_token', `${response.data.tokenType} ${response.data.accessToken}`, { path: '/' });
+        })
     }
-
-    const handleGoogleSubmit = () => {
-        const { login } = props;
-        console.log('google login');
-        (googleAuthObject as any).signIn()
-        .then((googleUserLogged: any) => {
-            const basicProfile = googleUserLogged.getBasicProfile();
-            setGoogleCurrentUser(googleUserLogged);
-            login(basicProfile.getEmail(), basicProfile.getName());
-        });
-    }
-
-    interface MyWindow extends Window {
-        gapi: any;
-    }
-
-    const params = {
-        client_id: '87323419200-0r386di22s709lrk72mr2ddcrjbd16n7.apps.googleusercontent.com',
-        ux_mode: 'popup'
-    }
-
-    function loadLoginApi() {
-        const { gapi } = (window as MyWindow & typeof globalThis); 
-        gapi.load('auth2', function() {
-            gapi.auth2
-                .init(params)
-                .then((response: any) => {
-                    console.log('init response: ', response);
-                    const googleAuthObject = gapi.auth2.getAuthInstance();
-                    setGoogleAuthObject(googleAuthObject);
-                    console.log("signed in", googleAuthObject.isSignedIn.get());
-
-                    googleAuthObject.isSignedIn.listen(googleLogOut);
-                })
-        });
-    }
-    const googleLogOut = (isSignIn: Boolean) => {
-        const { logOut, login } = props; 
-        console.log("listener result :", isSignIn)
-        
-        if (isSignIn) {
-            // googleAuthObject cant be undefined as the user is logged in
-            console.log("google user has signed");
-        } else {
-            logOut();
-        } 
-    }
-    
-    useEffect(() => {
-        loadLoginApi();
-    }, []);
 
     return (
         <div className={classes.container}>
             <FormControl className={classes.centered}>
-                <InputLabel htmlFor="email">
-                    Email address
+                <InputLabel htmlFor="username">
+                    User Name
                 </InputLabel>
-                <Input id="email" type="email" onChange={handleEmailChange} value={email}/>
-                <FormHelperText id="my-helper-text">
-                    We'll never share your email.
-                </FormHelperText>
+                <Input id="username" onChange={handleUsernameChange} value={username}/>
             </FormControl>
             <FormControl className={classes.centered}>
                 <InputLabel htmlFor="password">
@@ -103,18 +59,14 @@ function LoginForm(props: any) {
             <Button className={classes.centered} variant="contained" color="primary" onClick={handleSubmit}>
                 Login
             </Button>
-            <Button className={classes.centered} variant="contained" color="primary" onClick={handleGoogleSubmit}>
-                Google Login
-            </Button>
+            <GoogleLogin/>
         </div>
     );
   }
   const mapDispatchToProps = (dispatch: Dispatch<LoginActions>) => {
     return {
-        login: (email: string, password: string) =>
-        dispatch(actions.login(email, password)),
-        logOut: () =>
-        dispatch(actions.logOut())
+        onPopulateUserDetails: (userDetails : IUserDetails) =>
+        dispatch(actions.populateUserDetails(userDetails))
 
     }
   }

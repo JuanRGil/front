@@ -1,25 +1,14 @@
 import { ILoginState, Constants } from './types';
 const init: ILoginState = {
-    isAuthenticated: false,
-    name: '',
-    role: ''
+    userDetails: {}
 };
 export function loginReducer(state: ILoginState = init, 
 action: any): ILoginState {
     switch (action.type) {
-        case Constants.LOGIN:
+        case Constants.POPULATE_USER_DETAILS:
             return {
                 ...state,
-                isAuthenticated: action.payload.isAuthenticated,
-                name: action.payload.name,
-                role: action.payload.role
-            };
-        case Constants.LOGOUT:
-            return {
-                ...state,
-                isAuthenticated: action.payload.isAuthenticated,
-                name: '',
-                role: ''
+                userDetails: action.payload.userDetails
             };
         default:
             return state;

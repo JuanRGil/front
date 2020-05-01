@@ -1,19 +1,15 @@
 import React from 'react';
+import { useCookies } from 'react-cookie';
 import LoginForm from './components/login/Login';
 import Main from './components/main/Main';
-import { IRootState } from './store';
 import { connect } from 'react-redux';
 
-const mapStateToProps = ({ login }: IRootState) => {
-  const { isAuthenticated } = login;
-  return { isAuthenticated };
-}
 
-type ReduxType = ReturnType<typeof mapStateToProps>;
-
-class App extends React.Component<ReduxType> {
-  render(){
-    const {isAuthenticated} = this.props
+function App(props: any) {
+    const [cookie] = useCookies();
+    const isAuthenticated = (cookie.auth_token !== undefined) || (cookie.google_auth_token !== undefined);
+    console.log(cookie);
+    console.log("app IS AUTH?: ", isAuthenticated);
     return (
       <React.Fragment>
         {!isAuthenticated ?
@@ -23,7 +19,6 @@ class App extends React.Component<ReduxType> {
         }
       </React.Fragment>
     );
-  }
 }
 
-export default connect(mapStateToProps)(App);
+export default App;

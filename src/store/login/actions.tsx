@@ -1,18 +1,10 @@
 import { action } from 'typesafe-actions';
-import { Constants } from './types';
+import { Constants, IUserDetails } from './types';
 
-export function login(email: string, pass: string) {
-    console.log(`loging with email ${email} and pass ${pass}`);
-    return action(Constants.LOGIN, {
-        isAuthenticated: true,
-        name: 'aName',
-        role: 'Admin'
-    });
-}
 
-export function logOut() {
-    console.log("loging out");
-    return action(Constants.LOGOUT, {
-        isAuthenticated: false,
+export function populateUserDetails(userDetails : IUserDetails) {
+    console.log(`loging with user ${userDetails.username}`);
+    return action(Constants.POPULATE_USER_DETAILS, {
+        userDetails
     });
 }

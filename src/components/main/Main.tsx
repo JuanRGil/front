@@ -1,12 +1,12 @@
 import React from 'react';
+import Menu from '../menu/Menu';
+import Dashboard from '../dashboard/Dashboard';
 
 function Main(props : any) {
     return (
         <React.Fragment>
-            <div>WIP</div>
-            {/*<Header/>
-            <Menu/>
-            <Content/>*/}
+            <Menu />
+            <Dashboard />
         </React.Fragment>
 
     )

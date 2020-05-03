@@ -12,6 +12,19 @@ export interface IUserDetails {
     username: string,
     email : string
 }
+
+export enum Provider {
+    GOOGLE = 'Google',
+    TICKET_UP = 'Ticket UP'
+}
+export enum CookieNames {
+    AUTH_TOKEN = 'auth_token'
+}
+export interface TokenAndProvider {
+    token: string,
+    idToken?: string,
+    provider: Provider
+}
 export interface ILoginState {
     userDetails : IUserDetails | {}
 }

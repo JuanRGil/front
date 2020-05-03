@@ -8,7 +8,7 @@ import axios from 'axios';
 import GoogleLogin from './GoogleLogin';
 import { FormControl, InputLabel, Input, FormHelperText, Button } from '@material-ui/core';
 import * as actions from '../../store/login/actions';
-import { LoginActions, IUserDetails } from '../../store/login/types';
+import { LoginActions, IUserDetails, TokenAndProvider, Provider, CookieNames } from '../../store/login/types';
 import styles from './stylesLogin';
 
 function LoginForm(props: any) {
@@ -35,9 +35,12 @@ function LoginForm(props: any) {
             username,
             password
         }).then((response : any) => {
-            
             onPopulateUserDetails(response.data.userDetails);
-            setCookie('auth_token', `${response.data.tokenType} ${response.data.accessToken}`, { path: '/' });
+            const token : TokenAndProvider = {
+                token:  `${response.data.tokenType} ${response.data.accessToken}`,
+                provider: Provider.TICKET_UP
+            }
+            setCookie(CookieNames.AUTH_TOKEN, JSON.stringify(token), { path: '/' });
         })
     }
 

@@ -1,15 +1,21 @@
 import React from 'react';
-import { useCookies } from 'react-cookie';
+import { useCookies, withCookies } from 'react-cookie';
 import LoginForm from './components/login/Login';
 import Main from './components/main/Main';
-import { connect } from 'react-redux';
+import configureAuthorisation from './axiosInterceptors';
+import { TokenAndProvider, CookieNames } from './store/login/types';
 
 
 function App(props: any) {
-    const [cookie] = useCookies();
-    const isAuthenticated = (cookie.auth_token !== undefined) || (cookie.google_auth_token !== undefined);
+    const [cookie] = useCookies([CookieNames.AUTH_TOKEN]);
+    const { cookies } = props;
+    
+    const tokenAndProvider : TokenAndProvider = cookie && cookie.auth_token ? cookie.auth_token: {};
+
+    const isAuthenticated = (tokenAndProvider.token !== undefined);
     console.log(cookie);
     console.log("app IS AUTH?: ", isAuthenticated);
+    configureAuthorisation(tokenAndProvider as TokenAndProvider, cookies);
     return (
       <React.Fragment>
         {!isAuthenticated ?
@@ -21,4 +27,4 @@ function App(props: any) {
     );
 }
 
-export default App;
+export default withCookies(App);

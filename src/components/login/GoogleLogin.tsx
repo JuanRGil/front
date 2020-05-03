@@ -5,14 +5,13 @@ import compose from 'recompose/compose';
 import { withStyles, Button } from '@material-ui/core';
 import styles from './stylesLogin';
 import { Dispatch } from 'redux';
-import { LoginActions, IUserDetails } from '../../store/login/types';
+import { LoginActions, IUserDetails, TokenAndProvider, Provider, CookieNames } from '../../store/login/types';
 import { params } from '../../google_gapi/gapi';
 import * as actions from '../../store/login/actions';
 
 const GoogleLogin = (props : any) => {
 
     const [googleAuthObject, setGoogleAuthObject] = useState({});
-    const [googleCurrentUser, setGoogleCurrentUser] = useState();
     const [cookies, setCookie] = useCookies(['google_auth_token']);
 
     const handleGoogleSubmit = () => {
@@ -21,7 +20,6 @@ const GoogleLogin = (props : any) => {
         (googleAuthObject as any).signIn({prompt: 'select_account'})
         .then((googleUserLogged: any) => {
             const basicProfile = googleUserLogged.getBasicProfile();
-            setGoogleCurrentUser(googleUserLogged);
             console.log("basicprofile: ",basicProfile);
             onPopulateUserDetails({
                 name: basicProfile.getName(),
@@ -30,7 +28,12 @@ const GoogleLogin = (props : any) => {
                 email: basicProfile.getEmail()
             });
             const authResponse = googleUserLogged.getAuthResponse(true);
-            setCookie('google_auth_token', authResponse.access_token, { path: '/' });
+            const token : TokenAndProvider = {
+                token:  `${authResponse.token_type} ${authResponse.access_token}`,
+                provider: Provider.GOOGLE,
+                idToken: authResponse.id_token
+            }
+            setCookie(CookieNames.AUTH_TOKEN, JSON.stringify(token), { path: '/' });
         });
     }
     
